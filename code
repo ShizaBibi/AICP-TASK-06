@@ -1,0 +1,82 @@
+# Constants for weight ranges
+MIN_GRAVEL_WEIGHT = 49.9
+MAX_GRAVEL_WEIGHT = 50.1
+MIN_CEMENT_WEIGHT = 24.9
+MAX_CEMENT_WEIGHT = 25.1
+
+# Prices for each type of sack
+COST_CEMENT = 3
+COST_GRAVEL = 2
+COST_SAND = 2
+COST_SPECIAL_PACK = 10
+
+def validate_sack(weight, contents):
+    # Check contents
+    if contents not in ['C', 'G', 'S']:
+        return "Rejected: Invalid contents"
+    
+    # Check weight based on contents
+    if contents == 'C' and not (MIN_CEMENT_WEIGHT < weight < MAX_CEMENT_WEIGHT):
+        return "Rejected: Invalid weight for cement"
+    elif contents in ['G', 'S'] and not (MIN_GRAVEL_WEIGHT < weight < MAX_GRAVEL_WEIGHT):
+        return "Rejected: Invalid weight for gravel or sand"
+    
+    # Accepted sack
+    return f"Accepted: Contents - {contents}, Weight - {weight} kg"
+
+def process_order(order):
+    total_weight = 0
+    rejected_sacks = 0
+    
+    for contents, quantity in order.items():
+        for _ in range(quantity):
+            weight = float(input(f"Enter weight for {contents} sack: "))
+            result = validate_sack(weight, contents)
+
+            if "Rejected" in result:
+                rejected_sacks += 1
+                print(result)
+            else:
+                print(result)
+                total_weight += weight
+    
+    print(f"Total weight of the order: {total_weight} kg")
+    print(f"Number of sacks rejected from the order: {rejected_sacks}")
+    
+    return total_weight, rejected_sacks
+
+def calculate_price(total_weight, rejected_sacks):
+    regular_price = (
+        COST_CEMENT * (order.get('C', 0) - rejected_sacks) +
+        COST_GRAVEL * (order.get('G', 0) - rejected_sacks) +
+        COST_SAND * (order.get('S', 0) - rejected_sacks)
+    )
+
+    special_packs = min(order.get('C', 0), order.get('G', 0) // 2, order.get('S', 0) // 2)
+    discount_price = regular_price - special_packs * COST_SPECIAL_PACK
+    amount_saved = regular_price - discount_price
+
+    if discount_price < regular_price:
+        print(f"Regular Price: ${regular_price}")
+        print(f"Discount Price: ${discount_price}")
+        print(f"Amount Saved: ${amount_saved}")
+    else:
+        print("No discount applied. Regular price only.")
+
+# Task 1
+weight = float(input("Enter weight for a sack: "))
+contents = input("Enter contents for a sack (C, G, S): ")
+result = validate_sack(weight, contents)
+print(result)
+
+# Task 2
+order = {
+    'C': int(input("Enter the number of cement sacks: ")),
+    'G': int(input("Enter the number of gravel sacks: ")),
+    'S': int(input("Enter the number of sand sacks: "))
+}
+
+total_weight, rejected_sacks = process_order(order)
+
+# Task 3
+calculate_price(total_weight, rejected_sacks)
